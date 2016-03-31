@@ -1,4 +1,3 @@
-// Generated on 2016-03-30 using generator-angular 0.15.1
 'use strict';
 
 // # Globbing
@@ -9,8 +8,8 @@
 
 module.exports = function (grunt) {
 
-  // Time how long tasks take. Can help when optimizing build times
-  require('time-grunt')(grunt);
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+  //require('time-grunt')(grunt);
 
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
@@ -18,6 +17,16 @@ module.exports = function (grunt) {
     ngtemplates: 'grunt-angular-templates',
     cdnify: 'grunt-google-cdn'
   });
+  var yeomanConfig = {
+    app: 'app',
+    dist: 'dist',
+    test: 'test'
+  };
+
+  try {
+    yeomanConfig.app = require('./package.json').appPath || yeomanConfig.app;
+  } catch (e) {
+  }
 
   // Configurable paths for the application
   var appConfig = {
@@ -29,7 +38,7 @@ module.exports = function (grunt) {
   grunt.initConfig({
 
     // Project settings
-    yeoman: appConfig,
+    yeoman: yeomanConfig,
 
     // Watches files for changes and runs tasks based on the changed files
     watch: {
@@ -89,7 +98,7 @@ module.exports = function (grunt) {
                 '/app/styles',
                 connect.static('./app/styles')
               ),
-              connect.static(appConfig.app)
+              connect.static(yeomanConfig.app)
             ];
           }
         }
@@ -105,7 +114,7 @@ module.exports = function (grunt) {
                 '/bower_components',
                 connect.static('./bower_components')
               ),
-              connect.static(appConfig.app)
+              connect.static(yeomanConfig.app)
             ];
           }
         }
@@ -482,7 +491,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
-    'wiredep',
+    //'wiredep',
     'concurrent:test',
     'postcss',
     'connect:test',
@@ -491,7 +500,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'wiredep',
+    //'wiredep',
     'useminPrepare',
     'concurrent:dist',
     'postcss',
@@ -508,9 +517,19 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'newer:jscs',
-    'test',
+    'npm-install',
+    //'newer:jshint',
+    //'newer:jscs',
+    //'test',
     'build'
   ]);
+
+  grunt.registerTask('npm-install', 'install dependencies using npm', function () {
+    var exec = require('child_process').exec;
+    var cb = this.async();
+    exec('npm install', function (err, stdout) {
+      console.log(stdout);
+      cb();
+    });
+  });
 };
